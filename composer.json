@@ -15,7 +15,7 @@
             "Mythinking\\LaravelSms\\": "src/"
         },
         "files": [
-            "src/Kernel/Support/Helpers.php"
+            "src/Support/Helpers.php"
         ]
     },
     "autoload-dev": {
