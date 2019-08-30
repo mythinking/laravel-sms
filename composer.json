@@ -1,0 +1,56 @@
+{
+    "name": "mythinking/laravel-sms",
+    "description": "a common sms api for laravel",
+    "keywords": ["sms", "短信", "sdk"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "heha2o",
+            "email": "546604336@qq.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Mythinking\\LaravelSms\\": "src/"
+        },
+        "files": [
+            "src/Kernel/Support/Helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mythinking\\LaravelSms\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^7.0",
+        "illuminate/container": "^5.1",
+        "illuminate/support": "^5.1",
+        "pimple/pimple": "^3.0"
+    },
+    "require-dev": {
+        "illuminate/cache": "^5.1",
+        "illuminate/filesystem": "^5.1",
+        "illuminate/log": "^5.1",
+        "laravel/lumen-framework": "^5.1",
+        "phpunit/phpunit": "^4.8 || ^5.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mythinking\\LaravelSms\\Provider\\LaravelServiceProvider"
+            ],
+            "aliases": {
+                "API": "Mythinking\\LaravelSms\\Facade"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
+    }
+}
