@@ -13,8 +13,6 @@ use Mythinking\LaravelSms\Kernel\Contracts\SmsInterface;
 
 class Cl extends Base implements SmsInterface
 {
-    protected $config;
-
     protected $cl;
     // 创蓝发送短信接口URL
     const API_SEND_URL = "http://smssh1.253.com/msg/send/json";
@@ -26,6 +24,15 @@ class Cl extends Base implements SmsInterface
         parent::__construct();
         $this->config = $config;
         $this->cl = $config['cl'];
+    }
+
+    /**
+     * 重写自己的配置，用于多个账号配置
+     * @param $config
+     */
+    public function setConfig($config)
+    {
+        $this->cl = $config;
     }
 
     /**

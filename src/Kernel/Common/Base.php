@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class Base
 {
+    protected $config;
+
     /**
      * @var Response 消息返回
      */
@@ -26,6 +28,11 @@ class Base
     public function __construct()
     {
         $this->response = new Response();
+    }
+
+    public function setConfig($config)
+    {
+        $this->config = $config;
     }
 
     /**
