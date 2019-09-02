@@ -39,7 +39,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Mythinking\\LaravelSms\\Provider\\LaravelServiceProvider"
+                "Mythinking\\LaravelSms\\ServiceProvider"
             ],
             "aliases": {
                 "API": "Mythinking\\LaravelSms\\Facade"
