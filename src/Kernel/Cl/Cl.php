@@ -55,7 +55,7 @@ class Cl extends Base implements SmsInterface
             return $this->response->httpErr();
         }
 
-        return $this->response->setData((int)$arr['code'], $arr['errorMsg'], $arr['msgId'], $arr['time']);
+        return $this->response->setData((int)$arr['code'], $arr['errorMsg']??$arr['error'], $arr['msgId'] ?? $arr['msgid'], $arr['time']??'');
     }
 
     /**

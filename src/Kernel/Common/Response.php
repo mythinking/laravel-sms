@@ -62,10 +62,12 @@ class Response
     public function data()
     {
         return [
-          'code'    => $this->code,
-          'errmsg'  => $this->errmsg,
-          'msgid'   => $this->msgid,
-          'time'    => $this->time,
+            'code'    => $this->code,
+            'msg' => $this->errmsg,
+            'data' => [
+                'msgid'   => $this->msgid,
+                'time'    => $this->time,
+            ]
         ];
     }
 
