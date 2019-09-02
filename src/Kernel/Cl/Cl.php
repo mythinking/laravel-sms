@@ -14,6 +14,8 @@ use Mythinking\LaravelSms\Kernel\Contracts\SmsInterface;
 class Cl extends Base implements SmsInterface
 {
     protected $config;
+
+    protected $cl;
     // 创蓝发送短信接口URL
     const API_SEND_URL = "http://smssh1.253.com/msg/send/json";
     //发国际短信
@@ -23,6 +25,7 @@ class Cl extends Base implements SmsInterface
     {
         parent::__construct();
         $this->config = $config;
+        $this->cl = $config['cl'];
     }
 
     /**
@@ -93,7 +96,7 @@ class Cl extends Base implements SmsInterface
      */
     private function sendInternalSms(string $phone, string $templateid, array $params = [])
     {
-        $internal = $this->config['internal'];
+        $internal = $this->cl['internal'];
         $msg = format_templ($internal['templates'], $templateid, $params);
         $params = [
             'account'   => $internal['account'],
@@ -147,7 +150,7 @@ class Cl extends Base implements SmsInterface
      */
     private function sendExternalSms(string $phone, string $templateid, array $params = [])
     {
-        $external = $this->config['external'];
+        $external = $this->cl['external'];
         $msg = format_templ($external['templates'], $templateid, $params);
         $params = [
             'account'   => $external['account'],
