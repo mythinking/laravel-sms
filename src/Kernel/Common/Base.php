@@ -83,7 +83,17 @@ class Base
      */
     protected function logBefore(string $msgsid, string $phone, string $templateid, array $params = [])
     {
-        Log::notice("[Sms ".get_base_classname(get_class($this))."] sending..., msgsid: {$msgsid}, params: ". json_encode(compact('phone', 'templateid', 'params')));
+        Log::notice("[Sms ".get_base_classname(get_class($this))." {$msgsid}] sending..., params: ". json_encode(compact('phone', 'templateid', 'params')));
+    }
+
+    /**
+     * 发送消息日志
+     * @param string $phone
+     * @param string $msg
+     */
+    protected function logMsg(string $phone, string $msg)
+    {
+        Log::notice("[Sms ".get_base_classname(get_class($this))." {$this->getMsgSid()}] send, params: ". json_encode(compact('phone', 'msg')));
     }
 
     /**
@@ -96,9 +106,9 @@ class Base
         $res = $this->response->data();
 
         if (empty($code)) {
-            Log::notice("[Sms ".get_base_classname(get_class($this))."] send ok, msgsid: {$msgsid}, result: ". json_encode($res));
+            Log::notice("[Sms ".get_base_classname(get_class($this))." {$msgsid}] send ok, result: ". json_encode($res));
         } else {
-            Log::error(" [Sms ".get_base_classname(get_class($this))."] send error, msgsid: {$msgsid}, error: ". json_encode($res));
+            Log::error(" [Sms ".get_base_classname(get_class($this))." {$msgsid}] send error, error: ". json_encode($res));
         }
     }
 }

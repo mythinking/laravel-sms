@@ -83,12 +83,11 @@ class Cl extends Base implements SmsInterface
         } else {
             $arr = $this->resultSuccess();
         }
+        $this->logAfter($msgsid);
+
         if ($closure) {
             $closure($arr);
         }
-
-        $this->logAfter($msgsid);
-
 
         return ($this->response->getCode() == 0);
     }
@@ -105,6 +104,7 @@ class Cl extends Base implements SmsInterface
     {
         $internal = $this->cl['internal'];
         $msg = format_templ($internal['templates'], $templateid, $params);
+        $this->logMsg($phone, $msg);
         $params = [
             'account'   => $internal['account'],
             'password'  => $internal['password'],
@@ -159,6 +159,7 @@ class Cl extends Base implements SmsInterface
     {
         $external = $this->cl['external'];
         $msg = format_templ($external['templates'], $templateid, $params);
+        $this->logMsg($phone, $msg);
         $params = [
             'account'   => $external['account'],
             'password'  => $external['password'],
