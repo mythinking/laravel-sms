@@ -76,14 +76,24 @@ class Cl extends Base implements SmsInterface
         $msgsid = $this->setMsgSid();
         $this->logBefore($msgsid, $phone, $templateid, $params);
 
+        $data = [
+            'msg' => $msgsid,
+            'res' => json_encode([
+                "code"      => "0",
+                "msgId"     => "",
+                "time"      => date('YmdHis'),
+                "errorMsg"  => "测试模拟成功"
+            ]),
+            'msgsid' => $msgsid,
+        ];
         if ($this->config['sms_switch']) {
             if ($is_internal) {
-                $data = $this->sendInternalSms($phone, $templateid, $params);
+                $res = $this->sendInternalSms($phone, $templateid, $params);
             } else {
-                $data = $this->sendExternalSms($phone, $templateid, $params);
+                $res = $this->sendExternalSms($phone, $templateid, $params);
             }
-            $data['msgsid'] = $msgsid;
-            $arr = $this->result($data['res']);
+            $data = array_merge($data, $res);
+            $arr = $this->result($res['res']);
         } else {
             $arr = $this->resultSuccess();
         }
