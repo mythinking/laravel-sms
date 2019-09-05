@@ -40,7 +40,7 @@ if (! function_exists('check_phone_internal')) {
      * @param string $phone
      * @return bool
      */
-    function check_phone_internal(string $phone)
+    function check_phone_internal(string &$phone)
     {
         $phone = ltrim($phone, '+');
         if ($phone && strpos($phone, '86') === 0 || strlen($phone) == 11) {
@@ -51,36 +51,41 @@ if (! function_exists('check_phone_internal')) {
 }
 
 
-/**
- * 处理短信模板
- * @param array $templates 模板数组
- * @param string $templateid 模板id
- * @param array $params 模板中对应参数
- * @return mixed
- * @throws Exception
- */
-function format_templ(array $templates, string $templateid, array $params = [])
-{
-    if (!in_array($templateid, array_keys($templates))) {
-        throw new \Exception("The templateid [{$templateid}] is not exists!");
-    }
-    $format = $templates[$templateid];
-    if (empty($params)) {
-        return $format;
-    }
-    $res = array_reduce(array_keys($params), function ($c, $k) use ($params) {
-        return str_replace(":{$k}", $params[$k], $c);
-    }, $format);
+if (! function_exists('format_templ')) {
+    /**
+     * 处理短信模板
+     * @param array $templates 模板数组
+     * @param string $templateid 模板id
+     * @param array $params 模板中对应参数
+     * @return mixed
+     * @throws Exception
+     */
+    function format_templ(array $templates, string $templateid, array $params = [])
+    {
+        if (!in_array($templateid, array_keys($templates))) {
+            throw new \Exception("The templateid [{$templateid}] is not exists!");
+        }
+        $format = $templates[$templateid];
+        if (empty($params)) {
+            return $format;
+        }
+        $res = array_reduce(array_keys($params), function ($c, $k) use ($params) {
+            return str_replace(":{$k}", $params[$k], $c);
+        }, $format);
 
-    return $res;
+        return $res;
+    }
 }
 
-/**
- * 取带有命名空间的类名
- * @param $classname
- * @return string
- */
-function get_base_classname($classname)
-{
-    return basename(str_replace('\\', '/', $classname));
+if (! function_exists('get_base_classname')) {
+    /**
+     * 取带有命名空间的类名
+     * @param $classname
+     * @return string
+     */
+    function get_base_classname($classname)
+    {
+        return basename(str_replace('\\', '/', $classname));
+    }
 }
+

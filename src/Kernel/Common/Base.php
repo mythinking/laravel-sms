@@ -9,6 +9,7 @@
 namespace Mythinking\LaravelSms\Kernel\Common;
 
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class Base
@@ -110,5 +111,63 @@ class Base
         } else {
             Log::error(" [Sms ".get_base_classname(get_class($this))." {$msgsid}] send error, error: ". json_encode($res));
         }
+    }
+
+    /**
+     * 短信发送限制
+     * @param string $phone
+     * @param string $templateid
+     * @param int $max  每日限制
+     * @param int $lifecycle 单条单位时间重复发送限制
+     * @return bool|string
+     */
+    public function checkLimit(string $phone, string $templateid, $max = 10, $lifecycle = 120)
+    {
+        $key = "Laravel-sms:".get_base_classname(get_class($this)).":{$phone}:";
+        $key_max = $key.date('Ymd');
+        $key_template = $key."templateid";//用于中间变量，清除templateid
+        $time = time();
+
+        $template_str = Cache::get($key_template);
+        if (empty($template_str)) {
+            Cache::forever($key_template, $time);//no cache expire
+            $template_str = $time;
+        }
+
+        $key_lifecycle = $key.":{$template_str}:".$templateid.":last_send_time";//last send time
+
+        if (!empty($max)) {
+            $today_count = Cache::get($key_max);
+            if (empty($today_count)) {
+                Cache::put($key_max, 0, 24*60);//cache one day
+            } elseif ((int)$today_count >= $max) {
+                return '超过每日限制发送短信数量: '. $max;
+            }
+        }
+        if (!empty($lifecycle)) {
+            $last_send_time = Cache::get($key_lifecycle);
+            if (!empty($last_send_time) && ($time - $lifecycle <= (int)$last_send_time)) {
+                return $lifecycle.'秒内不能重复发送';
+            }
+        }
+        //add a account
+        Cache::increment($key_max);
+        Cache::forever($key_lifecycle, $time);//no cache expire
+
+        return true;
+    }
+
+    /**
+     * 清除发送限制
+     * @param string $phone
+     */
+    public function clearLimit(string $phone)
+    {
+        $key = "Laravel-sms:".get_base_classname(get_class($this)).":{$phone}:";
+        $key_max = $key.date('Ymd');
+        $key_template = $key."templateid";//用于中间变量，清除templateid
+
+        Cache::forget($key_max);
+        Cache::forget($key_template);
     }
 }

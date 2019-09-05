@@ -75,9 +75,9 @@ class Response
      * http 请求错误
      * @return array
      */
-    public function httpErr()
+    public function httpErr($msg = 'http request error.')
     {
-        return $this->setData(1, 'http request error.', '', date('YmdHis'));
+        return $this->setData(1, $msg, '', date('YmdHis'));
     }
 
     /**

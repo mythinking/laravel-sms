@@ -23,7 +23,7 @@ class Cl extends Base implements SmsInterface
     {
         parent::__construct();
         $this->config = $config;
-        $this->cl = $config['cl'];
+        $this->cl = $config['cl'] ?? [];
     }
 
     /**
@@ -50,7 +50,7 @@ class Cl extends Base implements SmsInterface
         "errorMsg":""
         }
          */
-        $arr = json_decode($res, true);
+        $arr = is_string($res) ? json_decode($res, true) : $res;
         if (empty($res) || empty($arr)) {
             return $this->response->httpErr();
         }
@@ -68,6 +68,9 @@ class Cl extends Base implements SmsInterface
      */
     public function send(string $phone, string $templateid, array $params = [], \Closure $closure = null)
     {
+        if (empty($this->cl)) {
+            return $this->response->httpErr('创蓝配置出错');
+        }
         $is_internal = check_phone_internal($phone);
 
         $msgsid = $this->setMsgSid();
@@ -75,18 +78,18 @@ class Cl extends Base implements SmsInterface
 
         if ($this->config['sms_switch']) {
             if ($is_internal) {
-                $res = $this->sendInternalSms($phone, $templateid, $params);
+                $data = $this->sendInternalSms($phone, $templateid, $params);
             } else {
-                $res = $this->sendExternalSms($phone, $templateid, $params);
+                $data = $this->sendExternalSms($phone, $templateid, $params);
             }
-            $arr = $this->result($res);
+            $arr = $this->result($data['res']);
         } else {
             $arr = $this->resultSuccess();
         }
         $this->logAfter($msgsid);
 
         if ($closure) {
-            $closure($arr);
+            $closure($arr, $data);
         }
 
         return ($this->response->getCode() == 0);
@@ -103,16 +106,27 @@ class Cl extends Base implements SmsInterface
     private function sendInternalSms(string $phone, string $templateid, array $params = [])
     {
         $internal = $this->cl['internal'];
-        $msg = format_templ($internal['templates'], $templateid, $params);
-        $this->logMsg($phone, $msg);
-        $params = [
-            'account'   => $internal['account'],
-            'password'  => $internal['password'],
-            'msg'       => urlencode($msg),
-            'phone'     => substr($phone, -11),
-        ];
+        $check = $this->checkLimit($phone, $templateid, $internal['max'] ?? null, $internal['lifecycle'] ?? null);
 
-        $res = curl_post(self::API_SEND_URL, $params);
+        $msg = format_templ($internal['templates'], $templateid, $params);
+        if ($check === true) {
+            $this->logMsg($phone, $msg);
+            $params = [
+                'account'   => $internal['account'],
+                'password'  => $internal['password'],
+                'msg'       => urlencode($msg),
+                'phone'     => substr($phone, -11),
+            ];
+
+            $res = curl_post(self::API_SEND_URL, $params);
+        } else {
+            $res = json_encode([
+                "code"      => "1",
+                "msgId"     => "",
+                "time"      => date('YmdHis'),
+                "errorMsg"  => $check
+            ]);
+        }
 
         //创蓝接口错误代码
         /*
@@ -144,7 +158,7 @@ class Cl extends Base implements SmsInterface
                '125' => '驳回模板匹配错误',
            ];
         */
-        return $res;
+        return compact('msg', 'res');
     }
 
     /**
@@ -158,16 +172,27 @@ class Cl extends Base implements SmsInterface
     private function sendExternalSms(string $phone, string $templateid, array $params = [])
     {
         $external = $this->cl['external'];
+        $check = $this->checkLimit($phone, $templateid, $internal['max'] ?? null, $internal['lifecycle'] ?? null);
         $msg = format_templ($external['templates'], $templateid, $params);
-        $this->logMsg($phone, $msg);
-        $params = [
-            'account'   => $external['account'],
-            'password'  => $external['password'],
-            'msg'       => urlencode($msg),
-            'mobile'    => $phone,
-        ];
 
-        $res = curl_post(self::API_SEND_EXT_URL, $params);
+        if ($check === true) {
+            $this->logMsg($phone, $msg);
+            $params = [
+                'account'   => $external['account'],
+                'password'  => $external['password'],
+                'msg'       => urlencode($msg),
+                'mobile'    => $phone,
+            ];
+
+            $res = curl_post(self::API_SEND_EXT_URL, $params);
+        } else {
+            $res = json_encode([
+                "code"      => "1",
+                "msgid"     => "",
+                "time"      => date('YmdHis'),
+                "error"     => $check
+            ]);
+        }
 
         //创蓝接口错误代码
         /*
@@ -186,6 +211,6 @@ class Cl extends Base implements SmsInterface
                 '129' => '产品价格配置错误',
             ];
         */
-        return $res;
+        return compact('msg', 'res');
     }
 }
