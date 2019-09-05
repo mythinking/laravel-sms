@@ -82,6 +82,7 @@ class Cl extends Base implements SmsInterface
             } else {
                 $data = $this->sendExternalSms($phone, $templateid, $params);
             }
+            $data['msgsid'] = $msgsid;
             $arr = $this->result($data['res']);
         } else {
             $arr = $this->resultSuccess();
