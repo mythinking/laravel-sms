@@ -96,6 +96,7 @@ class Cl extends Base implements SmsInterface
             $data = array_merge($data, $res);
             $arr = $this->result($res['res']);
         } else {
+            $data['msg'] = format_templ($this->cl['templates'], $zone_code, $templateid, $params);
             $arr = $this->resultSuccess();
         }
         $this->logAfter($msgsid);
