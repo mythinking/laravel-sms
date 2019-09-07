@@ -86,7 +86,6 @@ if (! function_exists('format_templ')) {
         if (empty($ts) || !in_array($templateid, array_keys($ts))) {
             throw new \Exception("The templateid [{$templateid}] is not exists!");
         }
-        dd($ts);
         $format = $ts[$templateid];
         if (empty($params)) {
             return $format;
