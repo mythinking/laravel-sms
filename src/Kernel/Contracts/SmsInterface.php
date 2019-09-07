@@ -14,12 +14,13 @@ interface SmsInterface
     /**
      * 发送短信
      * @param string $phone
+     * @param string $zone_code
      * @param string $templateid
      * @param array $params
      * @param \Closure|null $closure
      * @return mixed
      */
-    public function send(string $phone, string $templateid, array $params = [], \Closure $closure = null);
+    public function send(string $phone, string $zone_code, string $templateid, array $params = [], \Closure $closure = null);
 
     /**
      * 接口返回结果

@@ -54,18 +54,40 @@ if (! function_exists('check_phone_internal')) {
 if (! function_exists('format_templ')) {
     /**
      * 处理短信模板
-     * @param array $templates 模板数组
+     * @param array $templates 模板配置
+     * @param array $zone_code 区号
      * @param string $templateid 模板id
      * @param array $params 模板中对应参数
      * @return mixed
      * @throws Exception
      */
-    function format_templ(array $templates, string $templateid, array $params = [])
+    function format_templ(array $templates, string $zone_code, string $templateid, array $params = [])
     {
-        if (!in_array($templateid, array_keys($templates))) {
+        $default = $templates['default'];//默认模板
+        $list = $templates['list'];
+
+        //先找区号对应模板
+        $ts = [];
+        foreach ($list as $zs => $tarr) {
+            //拆分区号串852,886
+            $zarr = explode(',', (string)$zs);
+            if ($zarr) {
+                foreach ($zarr as $zcode) {
+                    if ($zcode == $zone_code) {
+                        $ts = array_merge($ts, $tarr);
+                    }
+                }
+                //default
+                if (empty($ts)) {
+                    $ts = $list[$default];
+                }
+            }
+        }
+        if (empty($ts) || !in_array($templateid, array_keys($ts))) {
             throw new \Exception("The templateid [{$templateid}] is not exists!");
         }
-        $format = $templates[$templateid];
+        dd($ts);
+        $format = $ts[$templateid];
         if (empty($params)) {
             return $format;
         }

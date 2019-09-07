@@ -24,17 +24,31 @@ class Sms
         $this->config = $config;
         $server_name = $this->config->get('sms.default');
 
-        $class_name = ucwords($server_name);
-        $class = "Mythinking\\LaravelSms\\Kernel\\{$class_name}\\{$class_name}";
-        $this->server = new $class($this->config->get('sms'));
+        $this->server = $this->getInstance($server_name);
     }
 
     /**
      * 获取服务
      * @return Mythinking\LaravelSms\Kernel\Contracts\SmsSmsInterface
      */
-    public function server()
+    public function server($default = null)
     {
+        if (!empty($default)) {
+            $this->server = $this->getInstance($default);
+        }
         return $this->server;
+    }
+
+    /**
+     * 实例化处理类
+     * @param $server_name
+     * @return mixed
+     */
+    private function getInstance($server_name)
+    {
+        $class_name = ucwords($server_name);
+        $class = "Mythinking\\LaravelSms\\Kernel\\{$class_name}\\{$class_name}";
+
+        return (new $class($this->config->get('sms')));
     }
 }

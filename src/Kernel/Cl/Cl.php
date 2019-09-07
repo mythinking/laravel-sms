@@ -61,12 +61,13 @@ class Cl extends Base implements SmsInterface
     /**
      * 发送短信
      * @param string $phone
+     * @param string $zone_code
      * @param string $templateid
      * @param array $params
      * @param \Closure|null $closure
      * @return bool
      */
-    public function send(string $phone, string $templateid, array $params = [], \Closure $closure = null)
+    public function send(string $phone, string $zone_code, string $templateid, array $params = [], \Closure $closure = null)
     {
         if (empty($this->cl)) {
             return $this->response->httpErr('创蓝配置出错');
@@ -88,9 +89,9 @@ class Cl extends Base implements SmsInterface
         ];
         if ($this->config['sms_switch']) {
             if ($is_internal) {
-                $res = $this->sendInternalSms($phone, $templateid, $params);
+                $res = $this->sendInternalSms($phone, $zone_code, $templateid, $params);
             } else {
-                $res = $this->sendExternalSms($phone, $templateid, $params);
+                $res = $this->sendExternalSms($phone, $zone_code, $templateid, $params);
             }
             $data = array_merge($data, $res);
             $arr = $this->result($res['res']);
@@ -109,17 +110,18 @@ class Cl extends Base implements SmsInterface
     /**
      * 国内短信
      * @param string $phone
+     * @param string $zone_code
      * @param string $templateid
      * @param array $params
      * @return mixed
      * @throws \Exception
      */
-    private function sendInternalSms(string $phone, string $templateid, array $params = [])
+    private function sendInternalSms(string $phone, string $zone_code, string $templateid, array $params = [])
     {
         $internal = $this->cl['internal'];
         $check = $this->checkLimit($phone, $templateid, $internal['max'] ?? null, $internal['lifecycle'] ?? null);
 
-        $msg = format_templ($internal['templates'], $templateid, $params);
+        $msg = format_templ($this->cl['templates'], $zone_code, $templateid, $params);
         if ($check === true) {
             $this->logMsg($phone, $msg);
             $params = [
@@ -180,11 +182,11 @@ class Cl extends Base implements SmsInterface
      * @return mixed
      * @throws \Exception
      */
-    private function sendExternalSms(string $phone, string $templateid, array $params = [])
+    private function sendExternalSms(string $phone, string $zone_code, string $templateid, array $params = [])
     {
         $external = $this->cl['external'];
         $check = $this->checkLimit($phone, $templateid, $internal['max'] ?? null, $internal['lifecycle'] ?? null);
-        $msg = format_templ($external['templates'], $templateid, $params);
+        $msg = format_templ($this->cl['templates'], $zone_code, $templateid, $params);
 
         if ($check === true) {
             $this->logMsg($phone, $msg);
