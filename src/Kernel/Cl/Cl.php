@@ -72,7 +72,7 @@ class Cl extends Base implements SmsInterface
         if (empty($this->cl)) {
             return $this->response->httpErr('创蓝配置出错');
         }
-        $is_internal = check_phone_internal($phone);
+        $is_internal = check_phone_internal($phone, $zone_code);
 
         $msgsid = $this->setMsgSid();
         $this->logBefore($msgsid, $phone, $templateid, $params);

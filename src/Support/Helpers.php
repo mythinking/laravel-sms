@@ -40,10 +40,10 @@ if (! function_exists('check_phone_internal')) {
      * @param string $phone
      * @return bool
      */
-    function check_phone_internal(string &$phone)
+    function check_phone_internal(string &$phone, string $zone_code='86')
     {
         $phone = ltrim($phone, '+');
-        if ($phone && strpos($phone, '86') === 0 || strlen($phone) == 11) {
+        if ($phone && strpos($phone, '86') === 0 || $zone_code == '86') {
             return true;
         }
         return false;
