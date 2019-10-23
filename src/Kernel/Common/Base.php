@@ -84,7 +84,7 @@ class Base
      */
     protected function logBefore(string $msgsid, string $phone, string $templateid, array $params = [])
     {
-        Log::notice("[Sms ".get_base_classname(get_class($this))." {$msgsid}] sending..., params: ". json_encode(compact('phone', 'templateid', 'params')));
+        Log::notice("[Sms ".get_base_classname(get_class($this))." {$msgsid}] sending..., params: ". json_encode(compact('phone', 'templateid', 'params'), JSON_UNESCAPED_UNICODE));
     }
 
     /**
@@ -94,7 +94,7 @@ class Base
      */
     protected function logMsg(string $phone, string $msg)
     {
-        Log::notice("[Sms ".get_base_classname(get_class($this))." {$this->getMsgSid()}] send, params: ". json_encode(compact('phone', 'msg')));
+        Log::notice("[Sms ".get_base_classname(get_class($this))." {$this->getMsgSid()}] send, params: ". json_encode(compact('phone', 'msg'), JSON_UNESCAPED_UNICODE));
     }
 
     /**
@@ -107,9 +107,9 @@ class Base
         $res = $this->response->data();
 
         if (empty($code)) {
-            Log::notice("[Sms ".get_base_classname(get_class($this))." {$msgsid}] send ok, result: ". json_encode($res));
+            Log::notice("[Sms ".get_base_classname(get_class($this))." {$msgsid}] send ok, result: ". json_encode($res, JSON_UNESCAPED_UNICODE));
         } else {
-            Log::error(" [Sms ".get_base_classname(get_class($this))." {$msgsid}] send error, error: ". json_encode($res));
+            Log::error(" [Sms ".get_base_classname(get_class($this))." {$msgsid}] send error, error: ". json_encode($res, JSON_UNESCAPED_UNICODE));
         }
     }
 

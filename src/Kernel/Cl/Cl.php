@@ -194,7 +194,7 @@ class Cl extends Base implements SmsInterface
             $params = [
                 'account'   => $external['account'],
                 'password'  => $external['password'],
-                'msg'       => urlencode($msg),
+                'msg'       => $msg,
                 'mobile'    => $phone,
             ];
 
